@@ -1,6 +1,6 @@
 # ReadMe
 
-This folder contains the actual results of completing mandatory and advanced (optional) tasks in the project * 0x01.SHELL, PERMISSIONS. *
+This folder contains the actual results of completing mandatory and advanced (optional) tasks in the project ___0x01.SHELL, PERMISSIONS.___
 
 ### Mandatory Tasks
 > There are fourteen in all, numbered 0 to 13 with a hyphen, followed by the name of the task.[^1]
