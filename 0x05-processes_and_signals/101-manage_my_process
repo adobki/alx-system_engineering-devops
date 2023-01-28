@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Daemon that manages manage_my_process script: starts, stops, or restarts it.
+# Receives/executes either of 3 commands. Prints error/exits for anything else.
+
+function cmdErr()
+{
+    echo "Usage: manage_my_process {start|stop|restart}"
+    exit
+}
+function funcStart()
+{
+    ./manage_my_process &
+    echo "$!" > /var/run/my_process.pid
+}
+function funcStop()
+{
+    pkill -f 'bash ./manage_my_process'
+    rm -f /var/run/my_process.pid > /dev/null 2>&1
+    rm -f /tmp/my_process > /dev/null 2>&1
+}
+
+if [ $# -ne 1 ]; then
+    cmdErr
+elif [ "$1" == start ]; then
+    funcStart
+    echo "manage_my_process started"
+elif [ "$1" == stop ]; then
+    funcStop
+    echo "manage_my_process stopped"
+elif [ "$1" == restart ]; then
+    funcStop; funcStart
+    echo "manage_my_process restarted"
+else
+    cmdErr
+fi
