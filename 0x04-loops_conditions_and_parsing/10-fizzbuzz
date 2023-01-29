@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# FizzBuzz Challenge with numbers from 1 to 100, and 3 & 5 as the multiples.
+# shellcheck disable=SC2034
+
+num=1
+while [ $num -le 100 ]; do
+    if [ $((num % 3)) == 0 ]; then
+	if [ $((num % 5)) == 0 ]; then
+            echo "FizzBuzz"
+        else
+            echo "Fizz"
+	fi
+    elif [ $((num % 5)) == 0 ]; then
+        echo "Buzz"
+    else
+        echo "$num"
+    fi
+    (( num++ ))
+done

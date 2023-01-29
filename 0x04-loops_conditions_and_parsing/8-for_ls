@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Displays content of current directory. Only the part of the name after the first dash is displayed.
+# shellcheck disable=SC2034,SC2012
+
+for i in $(ls | cut -d'-' -f2); do
+    echo "$i"
+done

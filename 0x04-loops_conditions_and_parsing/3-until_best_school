@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Displays "Best School" ten times using an until loop.
+# shellcheck disable=SC2034
+
+i=1
+until [ $i -gt 10 ]; do
+    echo "Best School"
+    (( i++ ))
+done

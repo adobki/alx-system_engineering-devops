@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Groups Apache log's visitors by IP & HTTP status code then displays the data.
+
+if [ -e "apache-access.log" ] && [ -f "apache-access.log" ]; then
+    awk '{ print($1, $9) }' < apache-access.log | sort | uniq -c | sort -gr
+fi
