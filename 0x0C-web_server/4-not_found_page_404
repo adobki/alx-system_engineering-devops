@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Do something.
+echo "Ceci n'est pas une page"
