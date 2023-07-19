@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Does same funtion as previous script (1-run_nginx_as_nginx) in seven lines or less.
+sudo service nginx stop
+sudo useradd -s /bin/false nginx > /dev/null 2>&1
+sudo sed -i "s/user www-data/user nginx/" /etc/nginx/nginx.conf
+sudo sed -i "s/80/8080/g" /etc/nginx/sites-available/default
+sudo -u nginx service nginx restart
