@@ -6,21 +6,52 @@ import requests
 from sys import argv
 
 
-def count_words(subreddit, word_list=[]):
-    """ Parses the titles of all hot articles and
-    pretty-prints a sorted count of given keywords.
+def count_words(subreddit, word_list=[], __title_words=None,
+                __hot_list='', __after='', __count=0):
+    """ Parses the titles of all hot articles and pretty-prints a sorted
+    count of given keywords.
     """
     # INPUT VALIDATION: Check if subreddit is string and two lists are lists
     if not isinstance(subreddit, str) or not isinstance(word_list, list):
         return
 
-    title_words = recurse(subreddit)
-    if not title_words:
+    if not __title_words:
+        """ Recursively fetches and returns the titles of all the hot
+        articles in a given subreddit.
+        """
+        # Declare variables used by request
+        header = {'User-agent': "Donald's ALX_SE API"}
+        query_str = {'t': 'all', 'limit': 100, 'after': __after,
+                     'count': __count}
+        url = 'https://reddit.com/r/{}/hot.json'.format(subreddit)
+
+        # Fetch data from REST API
+        request = requests.get(url, headers=header, params=query_str)
+
+        # Fetch titles of all hot articles and store all the words in a list
+        try:
+            prev_count = __count
+            for post in request.json()['data']['children']:
+                __hot_list += (post['data']['title'])
+                __count += 1
+                __after = post['data']['name']
+            if __count > prev_count:
+                count_words(subreddit, word_list, __title_words,
+                            __hot_list, __after, __count)
+                # This return ensures only last recursion passes this point
+                return
+            # Assignment in else ensures only last recursion passes this point
+            else:
+                __title_words = __hot_list
+        except Exception:
+            return
+
+    if not __title_words:
         return
     word_counts = {}
     for word in word_list:
         word = str(word).lower()
-        count = title_words.lower().split().count(word)
+        count = __title_words.lower().split().count(word)
         if count:
             if word in word_counts.keys():
                 word_counts[word] += count
@@ -28,43 +59,8 @@ def count_words(subreddit, word_list=[]):
                 word_counts[word] = count
 
     # Pretty-print results
-    for key in word_counts.keys():
+    for key in sorted(word_counts.keys()):
         print('{}: {}'.format(key, word_counts[key]))
-
-
-def recurse(subreddit, hot_list='', __after='', __count=0):
-    """ Recursively fetches and returns the titles
-    of all the hot articles in a given subreddit.
-    """
-    # INPUT VALIDATION: Check if subreddit is string and __hot_list is list
-    if not isinstance(subreddit, str):
-        return
-    if not isinstance(hot_list, str):
-        hot_list = ''
-
-    # Declare variables used by function
-    header = {'User-agent': "Donald's ALX_SE API"}
-    query_str = {'t': 'all', 'limit': 100, 'after': __after, 'count': __count}
-    url = 'https://reddit.com/r/{}/hot.json'.format(subreddit)
-
-    # Fetch data from REST API
-    request = requests.get(url, headers=header, params=query_str)
-
-    # Locate and return number of subreddit subscribers, or 0 on error
-    try:
-        result = []
-        prev_count = __count
-        for post in request.json()['data']['children']:
-            hot_list += (post['data']['title'])
-            __count += 1
-            __after = post['data']['name']
-        if __count > prev_count:
-            result = recurse(subreddit, hot_list, __after, __count)
-            if result:
-                return result
-        return hot_list
-    except Exception:
-        return
 
 
 if __name__ == '__main__':
