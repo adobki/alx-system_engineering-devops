@@ -1,0 +1,31 @@
+##
+# hbnb server configuration
+##
+server {
+        listen 80;
+        listen [::]:80;
+
+        server_name adobki.tech www.adobki.tech;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/ubuntu/AirBnB_clone_v4/hbnb.sock;
+    }
+
+    location /api/ {
+        include proxy_params;
+        proxy_pass http://unix:/home/ubuntu/AirBnB_clone_v4/hbnb_api.sock;
+    }
+}
+
+server {
+        listen 5003;
+        listen [::]:5003;
+
+        server_name api.adobki.tech www.adobki.tech/api;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/ubuntu/AirBnB_clone_v4/hbnb_api.sock;
+    }
+}
