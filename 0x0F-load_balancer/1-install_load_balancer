@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Setup a load balancer by installing and configuring HAProxy
+
+# Update packages and install HAProxy if necessary
+sudo apt update
+sudo apt install -y haproxy
+sudo service haproxy status
+
+# Enable init script so HAProxy launches on system startup
+sudo chmod 666 /etc/default/haproxy
+echo "
+ENABLED=1
+" >> /etc/default/haproxy
+sudo chmod 644 /etc/default/haproxy
+
+# Configure HAProxy to meet ALX load balancer requirements
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
+sudo chmod 666 /etc/haproxy/haproxy.cfg
+printf %s "
+# Frontend/Access Control List (ACL) config
+frontend http
+	bind *:80
+	mode http
+	default_backend roundrobin-source
+
+# Backend/servers config
+backend roundrobin-source
+	balance source
+	mode http
+	server web-01 34.207.63.141:80 check
+	server web-02 100.25.4.101:80 check
+
+# Enable statistics portal on /stats route and user AMAdmin
+listen am_stats
+	bind *:0505
+	stats enable
+	stats scope roundrobin-source
+	stats uri /stats
+	stats realm Haproxy\ Statistics
+	stats auth AMAdmin:AMAdm1nPa$$
+" >> /etc/haproxy/haproxy.cfg
+sudo chmod 644 /etc/haproxy/haproxy.cfg
+
+# Enable HAProxy logging
+echo "# Collect log with UDP
+\$ModLoad imudp
+\$UDPServerRun 514
+\$UDPServerAddress 127.0.0.1
+
+# Create separate log files based on the severity
+local0.* /var/log/haproxy-traffic.log
+local0.notice /var/log/haproxy-admin.log
+" > /tmp/am_rsyslog.conf
+sudo mv -f /tmp/am_rsyslog.conf /etc/rsyslog.d/am_rsyslog.conf
+sudo chmod 644 /tmp/am_rsyslog.conf
+sudo service rsyslog restart
+
+# Start HAProxy service and check its status
+sudo service haproxy restart
+sudo service haproxy status
